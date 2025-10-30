@@ -7,13 +7,8 @@
     --eggshell-white: #F8FEFF;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-   
-    
 
-}
+
 html {
     overflow-x: hidden;
 
@@ -22,7 +17,10 @@ html {
 body {
     font-family: "DM Sans", sans-serif;
     overflow-x: hidden;
-     box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
 }
 
 header {
@@ -125,10 +123,10 @@ header .nav-btn a {
 
 .hero {
     padding-top: 50px;
- background: linear-gradient(145deg, #090C9B 0%, #0C13B8 35%, #1C4EBF 70%, #2D7DD2 100%);
+    background: linear-gradient(145deg, #090C9B 0%, #0C13B8 35%, #1C4EBF 70%, #2D7DD2 100%);
 
 
-color: #000;
+    color: #000;
 
 
 
@@ -149,7 +147,7 @@ color: #000;
 .bubble {
     position: absolute;
     border-radius: 50%;
-     background: linear-gradient(135deg, #0A26D3 0%, #00C6FF 100%);
+    background: linear-gradient(135deg, #0A26D3 0%, #00C6FF 100%);
     animation: scaleBubble 4s ease-in-out infinite;
 }
 
@@ -215,6 +213,7 @@ color: #000;
     position: relative;
 
 }
+
 .hero-content-left span {
     background-color: var(--primary-color);
     color: var(--eggshell-white);
@@ -223,7 +222,7 @@ color: #000;
     border-radius: 50px;
     min-width: 500px;
     font-size: 10px;
-    
+
 }
 
 .hero-content-left h2 {
