@@ -80,6 +80,9 @@ header .nav-btn a {
 }
 
 @media (max-width: 480px)  {
+    header {
+        padding: 10px;
+    }
     .logo {
         margin-left: -4rem;
     }
@@ -166,7 +169,7 @@ header .nav-btn a {
         margin: 30px;
     }
     .hero-content-left h2 {
-    font-size: 30px;
+    font-size: 35px;
     width: 350px;
     
    
