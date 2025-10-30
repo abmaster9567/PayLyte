@@ -10,14 +10,12 @@
 
 
 html {
-    overflow-x: hidden;
-
+  overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 body {
     font-family: "DM Sans", sans-serif;
-    overflow-x: hidden;
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
 
@@ -74,7 +72,7 @@ header {
 }
 
 header .nav-btn {
-    margin-right: -22rem;
+    margin-right: -16rem;
 
 }
 
@@ -214,7 +212,7 @@ header .nav-btn a {
 
 }
 
-.hero-content-left span {
+/* .hero-content-left span {
     background-color: var(--primary-color);
     color: var(--eggshell-white);
     padding: 10px;
@@ -223,18 +221,19 @@ header .nav-btn a {
     min-width: 500px;
     font-size: 10px;
 
-}
+} */
 
 .hero-content-left h2 {
     width: 500px;
     font-size: 50px;
     font-weight: 700;
+    
 }
 
 .hero-content-left p {
     width: 600px;
-    margin-top: 10px;
     font-size: 20px;
+    margin-top: -30px;
 }
 
 .hero-cta {
@@ -247,8 +246,8 @@ header .nav-btn a {
 
 .hero-cta a {
     text-decoration: none;
-    background-color: var(--primary-color);
-    color: #FDFFFC;
+    background-color: #fff;
+    color: #000;
     text-align: center;
     padding: 20px;
     border-radius: 50px;
@@ -278,10 +277,15 @@ header .nav-btn a {
 }
 
 @media (max-width: 480px) {
+    .hero {
+         
+    }
     .hero-content {
-        justify-content: center;
-        align-items: center;
-        margin: 30px;
+        padding: 20px;
+        margin-top: 50px;
+        
+       
+        
     }
 
     .hero-content-left h2 {
@@ -298,8 +302,9 @@ header .nav-btn a {
     }
 
     .hero-cta a {
-        width: 150px;
+        width: 120px;
         font-size: 12px
     }
+    
 
 }
