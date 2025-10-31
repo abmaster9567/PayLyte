@@ -442,7 +442,7 @@ header .nav-btn a {
 }
 
 .hero-cta .lucide-icon {
-  display: inline-flex;
+  display: flex;
   stroke: var(--primary-color);
   justify-content: space-between;
   align-items: center;
