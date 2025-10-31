@@ -321,8 +321,8 @@ header .nav-btn a {
     justify-content: center;
     align-items: center;
    box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.25),
-    0 4px 8px rgba(9, 12, 155, 0.25);
+    0 8px 20px rgba(3, 7, 243, 0.338),
+    0 4px 8px rgba(3, 7, 245, 0.304);
   transition: all 0.3s ease;
 
 
