@@ -39,6 +39,24 @@
         <div class="nav-icon">
             <i class="fa-solid fa-bars-staggered"></i>
         </div>
+<!-- Premium Slide-Up Menu (Below Navbar) -->
+<div class="menu-overlay"></div>
+
+<div class="premium-slide-menu">
+  <div class="menu-header">
+    <h4>Menu</h4>
+    <button class="menu-close"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <ul>
+    <li><a href="#">Home</a></li>
+    <li><a href="#">Features</a></li>
+    <li><a href="#">Pricing</a></li>
+    <li><a href="#">Contact</a></li>
+    <li><a href="#" class="menu-btn"><i class="fa-regular fa-circle-down"></i> Download App</a></li>
+  </ul>
+</div>
+
+
     </header>
     <main>
         <section class="hero">
@@ -52,7 +70,7 @@
                         </div>
                     </h5>
                     </div>
-                    <h2> Go Beyond Payments With PayLyte</h2>
+                    <h2> Go Beyond Payments <div>With PayLyte</div></h2>
                     <p>Your trusted digital platform for smooth, secure, and smart transactions — anytime, anywhere.
                         Top up airtime, pay bills, send funds, and manage your digital life effortlessly.</p>
 
@@ -120,6 +138,28 @@
 
   typeEffect();
 </script>
+
+<script>
+  const navIcon = document.querySelector('.nav-icon i');
+  const menuOverlay = document.querySelector('.menu-overlay');
+  const premiumMenu = document.querySelector('.premium-slide-menu');
+  const closeBtn = document.querySelector('.menu-close');
+
+  function toggleMenu() {
+    premiumMenu.classList.toggle('active');
+    menuOverlay.classList.toggle('active');
+    document.body.style.overflow = premiumMenu.classList.contains('active') ? 'hidden' : '';
+  }
+
+  navIcon.addEventListener('click', toggleMenu);
+  closeBtn.addEventListener('click', toggleMenu);
+  menuOverlay.addEventListener('click', toggleMenu);
+</script>
+
+
+
+
+
 
 
 </body>

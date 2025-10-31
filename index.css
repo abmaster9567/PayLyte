@@ -126,15 +126,116 @@ header .nav-btn a {
 
 }
 
+/* Overlay (background dim) */
+.menu-overlay {
+  position: fixed;
+  top: 80px; /* below navbar */
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 80px);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s ease;
+  z-index: 997;
+}
+
+/* The menu container */
+.premium-slide-menu {
+  position: fixed;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(25px);
+  box-shadow: 0 -10px 40px rgba(9, 12, 155, 0.25);
+  border-radius: 20px 20px 0 0;
+  z-index: 998;
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  padding: 1.5rem 1.5rem 3rem;
+}
+
+/* Active state */
+.menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+.premium-slide-menu.active {
+  bottom: 0;
+}
+
+/* Header inside the menu */
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+
+.menu-header h4 {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.menu-close {
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  margin-left: -2rem;
+}
+
+.menu-close:hover {
+  transform: rotate(90deg);
+}
+
+/* Menu links */
+.premium-slide-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.premium-slide-menu ul li {
+  margin: 1rem 0;
+}
+
+.premium-slide-menu ul li a {
+  text-decoration: none;
+  color: #000;
+  font-size: 1.05rem;
+  font-weight: 500;
+  display: block;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.premium-slide-menu ul li a:hover {
+  color: var(--primary-color);
+  transform: translateX(5px);
+}
+
+/* Download button style */
+.menu-btn {
+  background: var(--primary-color);
+  color: #fff !important;
+  padding: 12px 18px;
+  border-radius: 40px;
+  text-align: center;
+  margin-top: 15px;
+  display: inline-block;
+  box-shadow: 0 8px 20px rgba(9, 12, 155, 0.25);
+  max-width: 200px;
+}
+
+
+
 .hero {
     padding-top: 50px;
     background: var(--eggshell-white);
-
-
-
-
-
-
 }
 
 .bubble-area {
@@ -290,6 +391,7 @@ header .nav-btn a {
     font-weight: 700;
     
 }
+
 
 .hero-content-left p {
     width: 600px;
