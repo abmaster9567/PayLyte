@@ -13,6 +13,9 @@
     <!-- Alternative: Free version via jsDelivr -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css" />
 
+    <!-- Lucide Icon CDN -->
+     <script src="https://unpkg.com/lucide@latest"></script>
+
     <link rel="stylesheet" href="index.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,8 +78,11 @@
                         Top up airtime, pay bills, send funds, and manage your digital life effortlessly.</p>
 
                     <div class="hero-cta">
-                        <a href="#"><i class="fa-brands fa-apple"></i>Get on Iphone</a>
-                        <a href="#"><i class="fa-brands fa-google-play"></i>Get on Android</a>
+                        <a href="#">
+                          <i class="lucide-icon" data-lucide="arrow-down-to-line"></i>
+                          <span>Download App</span>
+                        </a>
+                        <!-- <a href="#"><i class="fa-brands fa-google-play"></i>Get on Android</a> -->
                     </div>
                 </div>
                 <div class="hero-content-right">
@@ -154,6 +160,9 @@
   navIcon.addEventListener('click', toggleMenu);
   closeBtn.addEventListener('click', toggleMenu);
   menuOverlay.addEventListener('click', toggleMenu);
+</script>
+<script>
+  lucide.createIcons();
 </script>
 
 
