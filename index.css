@@ -246,14 +246,39 @@ header .nav-btn a {
   border-radius: 50px;
   font-size: 13px;
   font-weight: 500;
-  display: inline-flex;
+  display: flex;
   box-shadow: 0 2px 10px rgba(9, 12, 155, 0.15);
   text-align: center;
   height: 20px;
   margin-right: 10px;
   margin-bottom: -2rem;
+
+  
+}
+.typing-wrapper {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+   width: 180px;  
 }
 
+.typing-text {
+  border-right: 2px solid var(--primary-color);
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  animation: blink 0.7s step-end infinite;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+
+/* Cursor blink animation */
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
 
 .hero-content-left i {
     margin-right: 10px;
@@ -320,6 +345,97 @@ header .nav-btn a {
     width: 400px;
     height: 400px;
 }
+
+
+/* ---------- HERO ANIMATIONS ---------- */
+
+.hero-content-left {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: heroFadeUp 1s ease-out forwards;
+}
+
+.hero-content-left .hero-tag {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroTagFade 1.2s ease-out forwards 0.3s;
+}
+
+.hero-content-left h2 {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 1s ease-out forwards 0.6s;
+}
+
+.hero-content-left p {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 1s ease-out forwards 0.8s;
+}
+
+.hero-content-left .hero-cta {
+  opacity: 0;
+  transform: translateY(15px);
+  animation: fadeUp 1s ease-out forwards 1s;
+}
+
+/* Right-side image animation */
+.hero-content-right img {
+  opacity: 0;
+  transform: translateX(40px);
+  animation: imageSlideIn 1.2s ease-out forwards 0.9s;
+}
+
+/* Floating motion for image (infinite loop) */
+@keyframes floatImage {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.hero-content-right img {
+  animation: imageSlideIn 1.2s ease-out forwards 0.9s, floatImage 5s ease-in-out infinite;
+}
+
+/* Keyframes */
+@keyframes heroFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroTagFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes imageSlideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* CTA hover effect */
+.hero-cta a {
+  transition: all 0.3s ease;
+}
+
+.hero-cta a:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 18px rgba(9, 12, 155, 0.25);
+}
+
 
 @media (max-width: 480px) {
     
