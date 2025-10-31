@@ -146,7 +146,7 @@ header .nav-btn a {
   position: fixed;
   bottom: -100%;
   left: 0;
-  width: 100%;
+  width: 345px;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(25px);
   box-shadow: 0 -10px 40px rgba(9, 12, 155, 0.25);
