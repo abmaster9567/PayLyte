@@ -103,7 +103,7 @@ header .nav-btn a {
 
 @media (max-width: 480px) {
     header {
-        padding: 10px;
+        padding: 5px;
     }
 
     .logo {
@@ -449,7 +449,7 @@ header .nav-btn a {
     }
     
 .hero-content-left h5  {
-    margin-bottom: 0.1rem;
+    margin-bottom: 8px;
 }
      /* .hero-content-left span {
         display: flex;
@@ -462,7 +462,8 @@ header .nav-btn a {
     .hero-content-left h2 {
         font-size: 2rem;
         width: 350px;
-        margin-bottom: -0.5rem;
+        margin-bottom: -0.6rem;
+        margin-top: -1px;
         
 
 
