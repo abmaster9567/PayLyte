@@ -438,7 +438,7 @@ header .nav-btn a {
 
 }
 .hero-cta span {
-  margin-left: 4rem;
+  margin-left: 5rem;
 }
 
 .hero-cta .lucide-icon {
@@ -452,7 +452,7 @@ header .nav-btn a {
   height: 20px;
   background: var(--white-cc);
   border-radius: 50%;
-  margin-left: -4rem;
+  margin-left: -3rem;
 
 
 
