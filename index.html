@@ -16,6 +16,9 @@
   <!-- Lucide Icon CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
   <link rel="stylesheet" href="index.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,8 +61,8 @@
         <li><a href="#">Features</a></li>
         <li><a href="#">Pricing</a></li>
         <li><a href="#">Contact</a></li>
-        <a href="#" class="menu-btn"><i class="lucide-icon" data-lucide="arrow-right"></i> 
-         <span> Get Started</span>
+        <a href="#" class="menu-btn"><i class="lucide-icon" data-lucide="arrow-right"></i>
+          <span> Get Started</span>
         </a>
       </ul>
     </div>
@@ -105,22 +108,25 @@
 
     </section>
 
-<section class="about-us">
-  <article class="about-content">
-    <div class="about-content-left">
-      <span class="brush-text">About PayLyte</span>
-      <h5>At PayLyte, we’re redefining digital convenience.
-Our mission is simple — to make digital payments faster, smarter, and more accessible for everyone.
+    <section class="about-us" data-aos="fade-up" data-aos-duration="1000" data-aos-easing="ease-in-out">
+      <article class="about-content">
+        <div class="about-content-left" data-aos="fade-right" data-aos-delay="200" data-aos-duration="1000">
+          <span class="brush-text" data-aos="zoom-in" data-aos-delay="300">About PayLyte</span>
+          <h5 data-aos="fade-up" data-aos-delay="500" data-aos-duration="1000">At PayLyte, we’re redefining digital convenience.
+            Our mission is simple — to make digital payments faster, smarter, and more accessible for everyone.
 
-From airtime and data to bill payments and wallet services,<div class="break">PayLyte empowers individuals and businesses to manage everyday transactions effortlessly.
-Built on trust, innovation, and simplicity, we go beyond payments — delivering seamless digital experiences that connect people and possibilities.</div></h5>
+            From airtime and data to bill payments and wallet services,<div class="break" data-aos="fade-up" data-aos-delay="700" data-aos-duration="1000">PayLyte empowers individuals
+              and businesses to manage everyday transactions effortlessly.
+              Built on trust, innovation, and simplicity, we go beyond payments — delivering seamless digital
+              experiences that connect people and possibilities.</div>
+          </h5>
 
-    </div>
-    <div class="about-content-right">
-      <img src="https://i.ibb.co/ksRgvv7G/vvvv.jpg" alt="About US">
-    </div>
-  </article>
-</section>
+        </div>
+        <div class="about-content-right" data-aos="zoom-in-up" data-aos-delay="400" data-aos-duration="1200">
+          <img src="https://i.ibb.co/ksRgvv7G/vvvv.jpg" alt="About US">
+        </div>
+      </article>
+    </section>
 
   </main>
 
@@ -188,6 +194,16 @@ Built on trust, innovation, and simplicity, we go beyond payments — delivering
   <script>
     lucide.createIcons();
   </script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    once: false,
+    offset: 120,
+    duration: 1000,
+    easing: 'ease-in-out',
+  });
+</script>
+
 
 
 
