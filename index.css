@@ -37,6 +37,7 @@ header {
   z-index: 1000;
   flex-wrap: wrap;
   /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
+ 
 
 
 }
@@ -132,6 +133,7 @@ header .nav-btn a {
 @media (max-width: 480px) {
   header {
     padding: 5px;
+     border-bottom: 2px solid var(--primary-color);
   }
 
   .logo {
