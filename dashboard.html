@@ -1,0 +1,625 @@
+<?php
+
+header('Content-Type: text/html; charset=utf-8');
+
+// public_html/dashboard.php
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
+
+
+
+require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/src/Core/functions.php';
+
+use App\Models\User;
+use App\Models\Transaction;
+use App\Models\OtpMessage;
+
+$user = null;
+$recentTransactions = [];
+$pendingSellerOtpCount = 0;
+$deliveredBuyerOtpCount = 0;
+
+try {
+    $pdo = db_connect();
+    $userModel = new User($pdo);
+    $user = $userModel->findById($_SESSION['user_id']);
+    if (!$user) { session_destroy(); header("Location: login.php"); exit(); }
+
+    $transactionModel = new Transaction($pdo);
+    $recentTransactions = $transactionModel->getRecentTransactionsByUserId($user['id'], 8);
+
+    $otpMessageModel = new OtpMessage($pdo);
+    $deliveredBuyerOtpCount = $otpMessageModel->countDeliveredRequestsForBuyer($user['id']);
+    if ($user['role'] === 'seller' || $user['is_admin']) {
+        $pendingSellerOtpCount = $otpMessageModel->countPendingRequestsForSeller($user['id']);
+    }
+
+} catch (\Exception $e) {
+    error_log("Dashboard Page Error: " . $e->getMessage());
+    die("A temporary error occurred. Please try refreshing the page.");
+}
+
+$pageTitle = "Dashboard";
+$theme = $_SESSION['theme'] ?? 'light';
+?>
+<!DOCTYPE html>
+<html lang="en" data-theme="<?= $theme ?>">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><?= htmlspecialchars($pageTitle) ?> | SmartDigits</title>
+<link rel="manifest" href="/manifest.json">
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+  --primary: #002CED;
+  --secondary: #000051;
+  --accent: #f97316;
+  --success: #10b981;
+  --danger: #ef4444;
+  --light-bg: #f9fafb;
+  --dark-bg: #0f172a;
+  --card-light: #ffffff;
+  --card-dark: #1e293b;
+  --text-light: #111827;
+  --text-dark: #f9fafb;
+  --muted: #6b7280;
+  --radius: 14px;
+  --shadow: 0 6px 20px rgba(0,0,0,0.08);
+  --transition: all 0.3s ease;
+  --team: #000;
+}
+
+[data-theme="dark"] {
+  --light-bg: var(--dark-bg);
+  --card-light: var(--card-dark);
+  --text-light: var(--text-dark);
+  --team: #fff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background: var(--light-bg);
+  color: var(--text-light);
+  transition: var(--transition);
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 25px auto;
+  padding: 0 20px 120px; /* extra bottom padding for nav */
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.profile {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.profile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.header-left h4 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 16px;
+}
+.header-left .sub {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 3px;
+}
+.theme-toggle {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: var(--card-light);
+  box-shadow: var(--shadow);
+  color: var(--team);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+
+/* Wallet Card (KEPT EXACT - do not modify) */
+.wallet-card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  padding: 22px 25px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 25px;
+}
+.wallet-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.wallet-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 26px;
+  background: rgba(255,255,255,0.15);
+}
+.wallet-info h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+.wallet-info .amount {
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 5px;
+}
+.wallet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.wallet-actions a {
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  color: var(--primary);
+  transition: transform 0.2s;
+}
+.wallet-actions a.outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+}
+
+/* Quick Actions (REPLACED to match screenshot) */
+.quick-actions {
+  margin-top: 20px;
+}
+.quick-actions h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.quick-card {
+  background: var(--card-light);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  color: var(--text-light);
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(2,6,23,0.03);
+  transition: transform 0.12s;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+}
+.quick-card:hover { transform: translateY(-4px); }
+.quick-card .qc-icon {
+  width:56px;
+  height:56px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(124,77,255,0.06);
+  color: var(--primary);
+  font-size:20px;
+}
+.quick-card span { font-weight: 600; font-size: 14px; color: var(--muted); }
+
+/* More Features (keep similar structure but replaced with original features) */
+.more-features {
+  margin-top: 22px;
+}
+.more-features h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.feature-card {
+  background: var(--card-light);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  color: var(--text-light);
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(2,6,23,0.03);
+  transition: transform 0.12s;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+}
+.feature-card:hover { transform: translateY(-4px); }
+.feature-card i {
+  font-size: 20px;
+  color: var(--primary);
+  margin-bottom: 6px;
+  display: block;
+  background: rgba(37,99,235,0.06);
+  width:50px;
+  height:50px;
+  line-height:50px;
+  border-radius:10px;
+}
+
+/* Transactions */
+.transactions {
+  margin-top: 22px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.tx {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  background:var(--card-light);
+  border-radius:12px;
+  padding:12px;
+  box-shadow: 0 6px 20px rgba(2,6,23,0.03);
+}
+.tx-left { display:flex; gap:12px; align-items:center; }
+.tx-icon {
+  width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(180deg,#f3f4ff,#efeaff);
+  font-size:18px;
+  color:var(--primary);
+}
+.tx-meta h6{ margin:0; font-size:15px; font-weight:700;}
+.tx-meta small{ color:var(--muted); display:block; margin-top:4px; font-size:13px;}
+
+/* Status badges */
+.badge {
+  display:inline-block;
+  padding:6px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+.badge.success{ background:rgba(16,185,129,0.12); color:var(--success); }
+.badge.failed{ background:rgba(239,68,68,0.08); color:var(--danger); }
+
+/* Bottom nav */
+.bottom-nav{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:14px;
+  width:calc(100% - 40px);
+  max-width:980px;
+  background:var(--card-light);
+  border-radius:16px;
+  padding:8px 12px;
+  display:flex;
+  justify-content:space-between;
+  box-shadow:0 12px 30px rgba(2,6,23,0.06);
+  z-index:40;
+  align-items:center;
+}
+.nav-item{
+  text-decoration:none;
+  color:var(--muted);
+  font-size:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  padding:8px 6px;
+  width:18%;
+  text-align:center;
+}
+.nav-item.active{ color:var(--primary); font-weight:700; }
+.nav-item i{ font-size:18px; }
+
+/* Responsive */
+@media(max-width:900px){
+  .quick-grid { grid-template-columns: repeat(4, 1fr); }
+  .features-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media(max-width:600px){
+  .wallet-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+  .wallet-actions { width: 100%; justify-content: flex-start; }
+  .quick-card {
+    padding: 12px;
+  }
+  .quick-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .features-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .bottom-nav { left: 8px; transform:none; width:calc(100% - 16px); max-width:640px; border-radius:14px; }
+}
+</style>
+</head>
+<body data-theme="<?= $theme ?>">
+
+<div class="main-content">
+
+  <!-- Header (KEPT EXACT - do NOT modify) -->
+  <div class="header">
+    <div class="header-left">
+      <div class="profile"><img src="https://i.ibb.co/Kx9CrxBM/ava.jpg" alt="Profile"></div>
+      <div>
+        <h4>Welcome, <?= htmlspecialchars($user['username']) ?></h4>
+        <div class="sub">Your SmartDigits Dashboard</div>
+      </div>
+    </div>
+    <button class="theme-toggle" id="themeToggle">
+      <?= $theme === 'light' ? '<i class="fa fa-moon"></i> Dark' : '<i class="fa fa-sun"></i> Light' ?>
+    </button>
+  </div>
+
+
+  <!-- Wallet Card (KEPT EXACT - do NOT modify) -->
+  <div class="wallet-card fade-in-up">
+    <div class="wallet-left">
+      <div class="wallet-icon">
+        <i class="fa fa-wallet"></i>
+      </div>
+      <div class="wallet-info">
+        <h3>Wallet Balance</h3>
+        <div class="amount">₦<?= number_format($user['wallet_balance'],2) ?></div>
+      </div>
+    </div>
+    <div class="wallet-actions">
+      <a href="fund_wallet.php"><i class="fa fa-plus-circle"></i> Fund Wallet</a>
+      <a href="transaction_history.php" class="outline"><i class="fa fa-clock"></i> History</a>
+    </div>
+  </div>
+  
+
+  <!-- Quick Actions (REPLACED to match screenshot) -->
+  <div class="quick-actions">
+    <h3>Services</h3>
+    <div class="quick-grid">
+      <a href="buy_number.php" class="quick-card">
+        <div class="qc-icon"><i class="fa fa-phone"></i></div>
+        <span>Virtual Number</span>
+      </a>
+
+      <a href="smm_services.php" class="quick-card">
+        <div class="qc-icon"><i class="fa fa-rocket"></i></div>
+        <span>Boost Account</span>
+      </a>
+
+      <a href="feature_unavailable.php" class="quick-card">
+        <div class="qc-icon"><i class="fa fa-sim-card"></i></div>
+        <span>Purchase eSIM</span>
+      </a>
+
+      <a href="cabletv.php" class="quick-card">
+        <div class="qc-icon"><i class="fa fa-phone"></i></div>
+        <span>Rent Number (USA)</span>
+      </a>
+
+      <a href="order_history.php" class="quick-card">
+        <div class="qc-icon"><i class="fa fa-chart-simple"></i></div>
+        <span>Number Orders</span>
+      </a>
+
+      <a href="referr_earn.php" class="quick-card">
+        <div class="qc-icon"><i class="fa fa-gift"></i></div>
+        <span>Referral</span>
+      </a>
+
+      <a href="smm_order_history.php" class="quick-card">
+        <div class="qc-icon"><i class="fa fa-star"></i></div>
+        <span>Boosting Orders</span>
+      </a>
+
+      <a href="more.php" class="quick-card">
+        <div class="qc-icon"><i class="fa fa-ellipsis"></i></div>
+        <span>More</span>
+      </a>
+      <?php if ($user['is_admin']): ?>
+      <a href="admin/index.php" class="feature-card"><i class="fa fa-shield"></i><span>Admin Panel</span></a>
+      <?php endif; ?>
+    </div>
+  </div>
+
+  <!-- More Features (kept original options from your dashboard)
+  <div class="more-features">
+    <h3>More Features</h3>
+    <div class="features-grid">
+      <a href="order_history.php" class="feature-card"><i class="fa fa-chart-simple"></i><span>Number Orders</span></a>
+      <a href="referr_earn.php" class="feature-card"><i class="fa fa-user-friends"></i><span>Refer & Earn</span></a>
+      <a href="tutorials.php" class="feature-card"><i class="fa fa-tv"></i><span>Watch Tutorials</span></a>
+      <a href="smm_order_history.php" class="feature-card"><i class="fa fa-star"></i><span>Boosting Orders</span></a>
+      <a href="faq.php" class="feature-card"><i class="fa-solid fa-circle-question"></i><span>FAQ</span></a>
+      <a href="support.php" class="feature-card"><i class="fa fa-headset"></i><span>Support</span></a>
+      <?php if ($user['is_admin']): ?>
+      <a href="admin/index.php" class="feature-card"><i class="fa fa-shield"></i><span>Admin Panel</span></a>
+      <?php endif; ?>
+    </div>
+  </div> -->
+
+  <!-- Recent Activities -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; margin-bottom:8px;">
+    <strong>Recent Activities</strong>
+    <a href="transaction_history.php" class="muted" style="font-size:13px;">View all</a>
+  </div>
+
+  <div class="transactions" aria-live="polite">
+    <?php if (empty($recentTransactions)): ?>
+      <div class="tx">
+        <div class="tx-left">
+          <div class="tx-icon"><i class="fa fa-clock"></i></div>
+          <div class="tx-meta">
+            <h6>No recent transactions</h6>
+            <small class="muted">You have not made any transactions yet.</small>
+          </div>
+        </div>
+        <div class="tx-amount">
+          <span class="muted">—</span>
+        </div>
+      </div>
+    <?php else: ?>
+      <?php foreach ($recentTransactions as $tx): ?>
+        <?php
+          // Basic mapping for icon + status class
+          $icon = 'fa-exchange-alt';
+          $label = htmlspecialchars($tx['type'] ?? 'Transaction');
+          if (stripos($tx['type'] ?? '', 'data') !== false) { $icon = 'fa-wifi'; }
+          if (stripos($tx['type'] ?? '', 'airtime') !== false) { $icon = 'fa-phone'; }
+          if (stripos($tx['type'] ?? '', 'electric') !== false) { $icon = 'fa-plug'; }
+          $status = strtolower($tx['status'] ?? 'success');
+          $statusClass = $status === 'success' ? 'success' : ($status === 'failed' ? 'failed' : 'success');
+        ?>
+        <div class="tx">
+          <div class="tx-left">
+            <div class="tx-icon"><i class="fa <?= $icon ?>"></i></div>
+            <div class="tx-meta">
+              <h6><?= $label ?></h6>
+              <small class="muted"><?= date('l, M j, Y', strtotime($tx['created_at'] ?? $tx['date'] ?? 'now')) ?></small>
+            </div>
+          </div>
+
+          <div style="text-align:right;">
+            <div style="font-weight:800; font-size:15px;">₦<?= number_format($tx['amount'] ?? 0, 2) ?></div>
+            <div class="badge <?= $statusClass ?>"><?= ucfirst($status) ?></div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </div>
+
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+  <a href="dashboard.php" class="nav-item active"><i class="fa fa-house"></i><span>Home</span></a>
+  <a href="more.php" class="nav-item"><i class="fa fa-ellipsis"></i><span>More</span></a>
+  <a href="transaction_history.php" class="nav-item"><i class="fa fa-list"></i><span>Transactions</span></a>
+  <a href="rewards.php" class="nav-item"><i class="fa fa-star"></i><span>Rewards</span></a>
+  <a href="profile.php" class="nav-item"><i class="fa fa-user"></i><span>Profile</span></a>
+</nav>
+
+<!-- Wallet Funded Modal (if any) -->
+<?php if (!empty($user['wallet_alert'])): ?>
+  <div id="walletOverlay" style="position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(2,6,23,0.4); z-index:1200;">
+    <div style="width:92%; max-width:380px; background:var(--card-light); border-radius:18px; padding:18px; box-shadow:0 12px 30px rgba(2,6,23,0.06); text-align:center;">
+      <div style="width:64px;height:64px;margin:0 auto;border-radius:14px;background:linear-gradient(180deg,#eef2ff,#f8f5ff);display:flex;align-items:center;justify-content:center;">
+        <i class="fa fa-bell" style="font-size:26px;color:var(--secondary)"></i>
+      </div>
+      <h3 style="margin:14px 0 6px;">Wallet Funded</h3>
+      <p style="color:var(--muted); margin:0 0 14px;"><?= htmlspecialchars($user['wallet_alert']) ?></p>
+      <div style="display:flex; gap:8px;">
+        <button id="closeAlert" style="flex:1;padding:10px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;font-weight:700;">Okay</button>
+        <button id="dismissAlert" style="flex:0;padding:10px 12px;border-radius:12px;border:1px solid #e6e9ef;background:transparent;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <?php
+  // Clear after showing once
+  try {
+    $pdo->prepare("UPDATE users SET wallet_alert = NULL WHERE id = ?")->execute([$user['id']]);
+  } catch (\Exception $e) { /* ignore */ }
+  ?>
+<?php endif; ?>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const themeToggle = document.getElementById('themeToggle');
+  const bodyEl = document.body;
+
+  // Load saved theme or default
+  let savedTheme = localStorage.getItem('theme') || '<?= $theme ?>';
+  bodyEl.setAttribute('data-theme', savedTheme);
+  if (themeToggle) {
+    themeToggle.innerHTML = savedTheme === 'light' 
+      ? '<i class="fa fa-moon"></i> Dark' 
+      : '<i class="fa fa-sun"></i> Light';
+    themeToggle.addEventListener('click', () => {
+      let current = bodyEl.getAttribute('data-theme');
+      let next = current === 'light' ? 'dark' : 'light';
+      bodyEl.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeToggle.innerHTML = next === 'light' 
+        ? '<i class="fa fa-moon"></i> Dark' 
+        : '<i class="fa fa-sun"></i> Light';
+    });
+  }
+
+  // Wallet alert overlay close
+  const closeAlert = document.getElementById('closeAlert');
+  const dismissAlert = document.getElementById('dismissAlert');
+  const overlay = document.getElementById('walletOverlay');
+  if (overlay) {
+    closeAlert && closeAlert.addEventListener('click', () => overlay.remove());
+    dismissAlert && dismissAlert.addEventListener('click', () => overlay.remove());
+  }
+
+  // Lightweight notification polling: checks for new wallet alerts every 10s
+  setInterval(() => {
+    fetch('check_wallet_alert.php').then(res => res.json()).then(data => {
+      if (data.new_alert) {
+        const existing = document.getElementById('paylyte-toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.id = 'paylyte-toast';
+        toast.style.position = 'fixed';
+        toast.style.right = '18px';
+        toast.style.bottom = '92px';
+        toast.style.background = 'linear-gradient(135deg,#fff,#fbfbff)';
+        toast.style.padding = '12px 16px';
+        toast.style.borderRadius = '12px';
+        toast.style.boxShadow = '0 8px 30px rgba(2,6,23,0.08)';
+        toast.innerHTML = `<strong style="display:block">Wallet Update</strong><small style="color:#667085">${data.message}</small>`;
+        document.body.appendChild(toast);
+        setTimeout(()=> toast.remove(), 6000);
+      }
+    }).catch(()=>{ /* silent */ });
+  }, 10000);
+});
+</script>
+
+</body>
+</html>
